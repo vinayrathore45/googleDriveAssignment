@@ -1,20 +1,21 @@
 const express = require('express');
 const fs = require('fs');
 const { google } = require('googleapis');
-const { Readable } = require('stream');
 
 const app = express();
 
+app.use(express.json());
+
 const auth = new google.auth.GoogleAuth({
-  keyFile: 'path_to_your_credentials.json',
+  keyFile: './googleDriveAssignment/serviceCredentials.json',
   scopes: 'https://www.googleapis.com/auth/drive',
 });
 
 const drive = google.drive({ version: 'v3', auth });
 
 
-async function downloadVideoFile(fileId) {
-  const destPath = 'path_to_save_downloaded_video.mp4';
+const downloadVideoFile = async (fileId) => {
+  const destPath = './download.mp4';
   const destStream = fs.createWriteStream(destPath);
 
   const res = await drive.files.get({ fileId, alt: 'media' }, { responseType: 'stream' });
@@ -32,7 +33,7 @@ async function downloadVideoFile(fileId) {
   return destPath;
 }
 
-async function uploadVideoFile(filePath, folderId) {
+const uploadVideoFile  = async (filePath, folderId) => {
   const fileMetadata = {
     name: 'uploaded_video.mp4',
     parents: [folderId],
@@ -50,22 +51,29 @@ async function uploadVideoFile(filePath, folderId) {
   });
 
   console.log('File uploaded with ID:', res.data.id);
+  return res.data.id;
 }
 
-app.get('/videoTransfer', async (req, res) => {
-  const fileId = 'your_video_file_id';
- // const sourceFolderId = 'your_source_folder_id';
-  const destinationFolderId = 'your_destination_folder_id';
-
+app.post('/videoTransfer', async (req, res) => {
+  
   try {
+    const { fileId, destinationFolderId } = req.body;
+    if(!fileId || typeof(fileId)!= 'string') 
+      return res.status(400).send({msg: "Please Provide  source video file Id and it must be a string"});
+
+      if(!destinationFolderId || typeof(destinationFolderId)!= 'string') 
+        return res.status(400).send({msg: "Please Provide  destination folder Id and it must be a string"});
+
+
+
     const downloadedFilePath = await downloadVideoFile(fileId);
 
-    await uploadVideoFile(downloadedFilePath, destinationFolderId);
+    const uploadedFileId = await uploadVideoFile(downloadedFilePath, destinationFolderId);
 
-    res.status(200).send('Transfer completed successfully.');
+    res.status(200).send({msg: 'Transfer completed successfully.', uploadedFileId});
   } catch (error) {
     console.error('Transfer error:', error);
-    res.status(500).send({msg:'Transfer failed.', error});
+    res.status(500).send({msg:'Transfer failed.', error: error.message});
   }
 });
 
