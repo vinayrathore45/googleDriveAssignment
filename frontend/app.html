@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>File Transfer Progress</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f4f4f4;
+  }
+  .container {
+    text-align: center;
+  }
+  .input-group {
+    margin-bottom: 20px;
+  }
+  .input-group label {
+    display: block;
+    margin-bottom: 5px;
+  }
+  .input-group input {
+    width: 300px;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  .button-group button {
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  .button-group button:hover {
+    background-color: #0056b3;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <div class="input-group">
+    <label for="fileId">File ID:</label>
+    <input type="text" id="fileId" name="fileId" required>
+  </div>
+  <div class="input-group">
+    <label for="folderId">Folder ID:</label>
+    <input type="text" id="folderId" name="folderId" required>
+  </div>
+  <div class="button-group">
+    <button id="submitBtn" onclick="submitValues()">Submit</button>
+    <button onclick="checkProgress()">Check Progress</button>
+  </div>
+  <div id="progress"></div>
+</div>
+
+<script>
+
+function disableSubmitButton() {
+    document.getElementById('submitBtn').disabled = true;
+  }
+
+  // Function to enable the submit button
+  function enableSubmitButton() {
+    document.getElementById('submitBtn').disabled = false;
+  }
+
+  const submitValues = () => {
+    document.getElementById('progress').innerHTML = "";
+    disableSubmitButton();
+
+    const fileId = document.getElementById('fileId').value;
+    const destinationFolderId = document.getElementById('folderId').value;
+
+
+    fetch('http://localhost/videoTransfer', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ fileId, destinationFolderId })
+    })
+    .then(response => {
+      if (response.status) {
+        return response.json();
+       // alert('Transfer initiated successfully.');
+      } else {
+        alert('Failed to initiate transfer.');
+        enableSubmitButton();
+      }
+    })
+    .then(data => {
+        alert(data.msg|| data.error);
+        enableSubmitButton();
+    })
+    .catch(error => { 
+      console.error('Error:', error);
+      alert('An error occurred while processing your request.');
+      enableSubmitButton();
+    });
+  }
+
+  // Function to check progress
+  function checkProgress() {
+    // Fetch progress from backend (you can use AJAX or fetch API)
+    // Example using fetch API
+    fetch('http://localhost/monitorProgress')
+    .then(response => response.json())
+    .then(data => {
+      const progressElement = document.getElementById('progress');
+      progressElement.innerHTML = `
+        <p>Download Progress: ${data.download}%</p>
+        <p>Upload Progress: ${data.upload}%</p>
+      `;
+      if (data.download !== 100 || data.upload !== 100) {
+        // If not, schedule another progress check in 1 second
+        setTimeout(checkProgress, 1000);
+      }
+      //  else {
+      //   // If both progress are 100%, display transfer completed message
+      //   alert('Transfer completed.');
+      // }
+    })
+    .catch(error => {
+      console.error('Error:', error);
+      alert('An error occurred while fetching progress.');
+    });
+  }
+</script>
+</body>
+</html>
