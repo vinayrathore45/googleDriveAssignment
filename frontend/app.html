@@ -73,7 +73,7 @@
     const destinationFolderId = document.getElementById('folderId').value;
 
 
-    fetch('http://localhost/videoTransfer', {
+    fetch('/videoTransfer', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -102,7 +102,7 @@
   
   const  checkProgress = () => {
     
-    fetch('http://localhost/monitorProgress')
+    fetch('/monitorProgress')
     .then(response => response.json())
     .then(data => {
       const progressElement = document.getElementById('progress');
