@@ -14,9 +14,9 @@ const progress = {
   download: 0,
   upload: 0
 };
-const serviceCredentials = JSON.parse(process.env.serviceCredentials);
+
 const auth = new google.auth.GoogleAuth({
-  credentials: serviceCredentials,
+  keyFile: './serviceCredentials.json'/*JSON.parse(process.env.serviceCredentials)*/,
   scopes: 'https://www.googleapis.com/auth/drive',
 });
 
