@@ -116,7 +116,7 @@ app.get('/monitorProgress', (req, res) => {
 app.use(express.static('../frontend'));
 
 app.get('/', (req, res) => {
-    res.sendFile('./frontend/app.html');
+    res.sendFile('../frontend/app.html');
   });
 app.listen(80, () => {
   console.log('Server is running on port ' + 80);
