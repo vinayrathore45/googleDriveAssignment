@@ -113,7 +113,7 @@ app.get('/monitorProgress', (req, res) => {
   res.json(progress);
 });
 
-app.use(express.static('./frontend'));
+app.use(express.static('../frontend'));
 
 app.get('/', (req, res) => {
     res.sendFile('./frontend/app.html');
