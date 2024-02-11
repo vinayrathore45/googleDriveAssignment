@@ -9,14 +9,14 @@ const app = express();
 app.use(express.json());
 
 dotenv.config({ path: path.resolve(__dirname,'./.env')});
-
+const serviceCredentials = JSON.parse(process.env.serviceCredentials);
 const progress = {
   download: 0,
   upload: 0
 };
 
 const auth = new google.auth.GoogleAuth({
-  keyFile: './serviceCredentials.json'/*JSON.parse(process.env.serviceCredentials)*/,
+  credentials:serviceCredentials ,
   scopes: 'https://www.googleapis.com/auth/drive',
 });
 
@@ -74,12 +74,10 @@ const uploadVideoFile  = async (filePath, folderId) => {
     fields: 'id',
   },
    { onUploadProgress: (evt) => {
-      uploadProgress = Math.round((evt.bytesRead / fileSize) * 100);   /*.bytesUploaded*/
+      uploadProgress = Math.round((evt.bytesRead / fileSize) * 100); 
       progress.upload = uploadProgress;
     }}
   );
-
-  console.log('File uploaded with ID:', res.data.id);
   return res.data.id;
 }
 
@@ -107,7 +105,6 @@ app.post('/videoTransfer', async (req, res) => {
 
     res.status(200).send({msg: 'Transfer completed successfully.', uploadedFileId});
   } catch (error) {
-    console.error('Transfer error:', error);
     res.status(500).send({msg:'Transfer failed.', error: error.message});
   }
 });
@@ -119,10 +116,8 @@ app.get('/monitorProgress', (req, res) => {
 app.use(express.static('./frontend'));
 
 app.get('/', (req, res) => {
-    // Serve the HTML file using res.sendFile
     res.sendFile('./frontend/app.html');
   });
-// Start the server
 app.listen(80, () => {
   console.log('Server is running on port ' + 80);
 });

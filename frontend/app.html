@@ -64,18 +64,10 @@
 
 <script>
 
-function disableSubmitButton() {
-    document.getElementById('submitBtn').disabled = true;
-  }
-
-  // Function to enable the submit button
-  function enableSubmitButton() {
-    document.getElementById('submitBtn').disabled = false;
-  }
-
   const submitValues = () => {
     document.getElementById('progress').innerHTML = "";
-    disableSubmitButton();
+
+    document.getElementById('submitBtn').disabled = true;
 
     const fileId = document.getElementById('fileId').value;
     const destinationFolderId = document.getElementById('folderId').value;
@@ -91,27 +83,25 @@ function disableSubmitButton() {
     .then(response => {
       if (response.status) {
         return response.json();
-       // alert('Transfer initiated successfully.');
       } else {
         alert('Failed to initiate transfer.');
-        enableSubmitButton();
+        document.getElementById('submitBtn').disabled = false;
       }
     })
     .then(data => {
         alert(data.msg|| data.error);
-        enableSubmitButton();
+        document.getElementById('submitBtn').disabled = false;
     })
     .catch(error => { 
       console.error('Error:', error);
       alert('An error occurred while processing your request.');
-      enableSubmitButton();
+      document.getElementById('submitBtn').disabled = false;
     });
   }
 
-  // Function to check progress
-  function checkProgress() {
-    // Fetch progress from backend (you can use AJAX or fetch API)
-    // Example using fetch API
+  
+  const  checkProgress = () => {
+    
     fetch('http://localhost/monitorProgress')
     .then(response => response.json())
     .then(data => {
@@ -120,14 +110,7 @@ function disableSubmitButton() {
         <p>Download Progress: ${data.download}%</p>
         <p>Upload Progress: ${data.upload}%</p>
       `;
-      if (data.download !== 100 || data.upload !== 100) {
-        // If not, schedule another progress check in 1 second
-        setTimeout(checkProgress, 1000);
-      }
-      //  else {
-      //   // If both progress are 100%, display transfer completed message
-      //   alert('Transfer completed.');
-      // }
+      if (data.download !== 100 || data.upload !== 100) setTimeout(checkProgress, 1000);
     })
     .catch(error => {
       console.error('Error:', error);
