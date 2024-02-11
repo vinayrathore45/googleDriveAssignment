@@ -8,7 +8,7 @@ const app = express();
 
 app.use(express.json());
 
-dotenv.config({ path: path.resolve(__dirname,'./.env')});
+dotenv.config({ path: path.resolve(__dirname,'../.env')});
 const serviceCredentials = JSON.parse(process.env.serviceCredentials);
 const progress = {
   download: 0,
@@ -113,10 +113,10 @@ app.get('/monitorProgress', (req, res) => {
   res.json(progress);
 });
 
-app.use(express.static('./frontend'));
+app.use(express.static(path.join(__dirname, "..","frontend/")));
 
 app.get('/', (req, res) => {
-    res.sendFile('./frontend/app.html');
+    res.sendFile(path.join(__dirname,"..", "frontend/app.html"));
   });
 app.listen(80, () => {
   console.log('Server is running on port ' + 80);
