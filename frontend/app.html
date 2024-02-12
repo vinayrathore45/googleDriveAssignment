@@ -63,16 +63,16 @@
 </div>
 
 <script>
-
+  //function that will run on pressing submit button
   const submitValues = () => {
     document.getElementById('progress').innerHTML = "";
-
+  
     document.getElementById('submitBtn').disabled = true;
 
     const fileId = document.getElementById('fileId').value;
     const destinationFolderId = document.getElementById('folderId').value;
 
-
+    //Calling the route that will download and upload the file
     fetch('/videoTransfer', {
       method: 'POST',
       headers: {
@@ -99,7 +99,7 @@
     });
   }
 
-  
+ //function that will run on pressing check progress button
   const  checkProgress = () => {
     
     fetch('/monitorProgress')
